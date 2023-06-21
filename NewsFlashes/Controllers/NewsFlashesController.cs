@@ -21,113 +21,126 @@ namespace NewsFlashes.Controllers
 
         public ActionResult Index()
         {
-            Response.AppendHeader("Access-Control-Allow-Origin", "*");
-            List<NewsFlash> flashes = new List<NewsFlash>();
-            string constr = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
-            using (MySqlConnection con = new MySqlConnection(constr))
+            try
             {
-                string query = "SELECT id, title, date FROM news_flashes";
-                using (MySqlCommand cmd = new MySqlCommand(query))
+                List<NewsFlash> flashes = new List<NewsFlash>();
+                string constr = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
+                using (MySqlConnection con = new MySqlConnection(constr))
                 {
-                    cmd.Connection = con;
-                    con.Open();
-                    using (MySqlDataReader sdr = cmd.ExecuteReader())
+                    string query = "SELECT id, title, date FROM news_flashes";
+                    using (MySqlCommand cmd = new MySqlCommand(query))
                     {
-                        while (sdr.Read())
+                        cmd.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = cmd.ExecuteReader())
                         {
-                            flashes.Add(new NewsFlash
+                            while (sdr.Read())
                             {
-                                Id = Convert.ToInt32(sdr["id"]),
-                                Title = sdr["title"].ToString(),
-                                Date = (DateTime)sdr["date"]
-                            });
+                                flashes.Add(new NewsFlash
+                                {
+                                    Id = Convert.ToInt32(sdr["id"]),
+                                    Title = sdr["title"].ToString(),
+                                    Date = (DateTime)sdr["date"]
+                                });
+                            }
                         }
+                        con.Close();
                     }
-                    con.Close();
                 }
+                return Json(flashes, JsonRequestBehavior.AllowGet);
             }
-            return Json(flashes, JsonRequestBehavior.AllowGet);
-        }
-
-
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
+            catch (Exception ex)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return Content("An error occurred in Index method" + ex.Message);
             }
-            NewsFlash newsFlash = db.NewsFlashes.Find(id);
-            if (newsFlash == null)
-            {
-                return HttpNotFound();
-            }
-            return View(newsFlash);
+            
         }
 
         [System.Web.Http.HttpPost]
         public ActionResult Create([FromBody] string title)
         {
-            DateTime Date = DateTime.Now;
-            string constr = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
-            using (MySqlConnection con = new MySqlConnection(constr))
+            try
             {
-                string query = "INSERT INTO news_flashes (title, date) VALUES (@Title, @Date)";
-                using (MySqlCommand cmd = new MySqlCommand(query))
+                DateTime Date = DateTime.Now;
+                string constr = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
+                using (MySqlConnection con = new MySqlConnection(constr))
                 {
-                    cmd.Parameters.AddWithValue("@Title", title);
-                    cmd.Parameters.AddWithValue("@Date", Date);
-                    cmd.Connection = con;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
+                    string query = "INSERT INTO news_flashes (title, date) VALUES (@Title, @Date)";
+                    using (MySqlCommand cmd = new MySqlCommand(query))
+                    {
+                        cmd.Parameters.AddWithValue("@Title", title);
+                        cmd.Parameters.AddWithValue("@Date", Date);
+                        cmd.Connection = con;
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                    }
                 }
-            }
 
-            return RedirectToAction("Index");
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return Content("An error occurred in Create method" + ex.Message);
+            }
+            
         }
 
 
         [System.Web.Http.HttpPut]
         public ActionResult Edit(NewsFlash flash)
         {
-            Response.AppendHeader("Access-Control-Allow-Origin", "*");
-            string constr = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
-            using (MySqlConnection con = new MySqlConnection(constr))
+            try
             {
-                string query = "UPDATE news_flashes SET title = @Title, date = @Date WHERE id = @Id";
-                using (MySqlCommand cmd = new MySqlCommand(query))
+                string constr = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
+                using (MySqlConnection con = new MySqlConnection(constr))
                 {
-                    cmd.Parameters.AddWithValue("@Title", flash.Title);
-                    cmd.Parameters.AddWithValue("@Date", flash.Date);
-                    cmd.Parameters.AddWithValue("@Id", flash.Id);
-                    cmd.Connection = con;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
+                    string query = "UPDATE news_flashes SET title = @Title, date = @Date WHERE id = @Id";
+                    using (MySqlCommand cmd = new MySqlCommand(query))
+                    {
+                        cmd.Parameters.AddWithValue("@Title", flash.Title);
+                        cmd.Parameters.AddWithValue("@Date", flash.Date);
+                        cmd.Parameters.AddWithValue("@Id", flash.Id);
+                        cmd.Connection = con;
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                    }
                 }
-            }
 
-            return RedirectToAction("Index");
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return Content("An error occurred in Edit method" + ex.Message);
+            }
         }
 
         [System.Web.Http.HttpPost]
         public ActionResult Delete(int id)
         {
-            string constr = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
-            using (MySqlConnection con = new MySqlConnection(constr))
+            try
             {
-                string query = "DELETE FROM news_flashes WHERE id = @Id";
-                using (MySqlCommand cmd = new MySqlCommand(query))
+                string constr = ConfigurationManager.ConnectionStrings["ConString"].ConnectionString;
+                using (MySqlConnection con = new MySqlConnection(constr))
                 {
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    cmd.Connection = con;
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-                    con.Close();
+                    string query = "DELETE FROM news_flashes WHERE id = @Id";
+                    using (MySqlCommand cmd = new MySqlCommand(query))
+                    {
+                        cmd.Parameters.AddWithValue("@Id", id);
+                        cmd.Connection = con;
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                    }
                 }
-            }
 
-            return RedirectToAction("Index");
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return Content("An error occurred in Delete method" + ex.Message);
+            }
         }
 
 
