@@ -15,7 +15,6 @@ using System.Web.Services.Description;
 
 namespace NewsFlashes.Controllers
 {
-    [EnableCors(origins: "http://localhost:5173/", headers: "*", methods: "PUT")]
     public class NewsFlashesController : Controller
     {
         private NewsFlashDbContext db = new NewsFlashDbContext();
@@ -40,7 +39,7 @@ namespace NewsFlashes.Controllers
                             {
                                 Id = Convert.ToInt32(sdr["id"]),
                                 Title = sdr["title"].ToString(),
-                                Date = Convert.ToDateTime(sdr["date"])
+                                Date = (DateTime)sdr["date"]
                             });
                         }
                     }
